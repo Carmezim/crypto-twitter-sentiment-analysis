@@ -1,5 +1,5 @@
 # Sentiment Analysis on Crypto Tweets
-Model and preprocessin code used were made by and adapted from https://github.com/abdulfatir/twitter-sentiment-analysis/.
+Model and pre-processing code used were made by and adapted from https://github.com/abdulfatir/twitter-sentiment-analysis/.
 
 
 ## Requirements
