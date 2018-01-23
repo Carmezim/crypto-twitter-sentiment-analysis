@@ -44,7 +44,7 @@ For more details or to change names/directories check `lstm.py`.
 generate a preprocessed version of the dataset.
 3. Run `stats.py <preprocessed-csv-path>` where `<preprocessed-csv-path>` is the
 path of (the labeled dataset) csv generated from `preprocess.py`.
-This gives general statistical information about the dataset and will two pickle files which
+This gives general statistical information about the dataset and will yield two pickle files which
 are the frequency distribution of unigrams and bigrams in the training dataset.
 
 After the above steps, you should have four files in total:
@@ -56,7 +56,7 @@ frequency distribution of unigrams and frequency distribution of bigrams respect
 
 1. Create a `/models` directory where the trained models will be stored.
 2. Run `python3 lstm.py dataset/train-processed.csv`. It's advised to train
-this model on GPUs or else it'll take several hours if trained on CPUs.
+this model on GPUs, on CPUs it'll take several hours to run a few epochs.
 
 ### Testing:
 
