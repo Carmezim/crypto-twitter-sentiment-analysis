@@ -32,10 +32,10 @@ INTERVAL = 900
 N_TWETES = 3000 # number of tweets to search and download
 
 # keys and tokens
-consumer_key = FILL
-consumer_secret = FILL
-access_secret = FILL
-access_token_secret = FILL
+consumer_key = "0jqQ9x9EMSwhzmdVqa2rhKZOV"
+consumer_secret = "lvcOqrqYxTLtNMBp2lYaWv8FrSgWdm42EnTXv4JrTXE0OkwZwO"
+access_secret = "190077033-boOytrrSo5uekpm08zlfQfIpCrCo7XSfMERkz86O"
+access_token_secret = "1i7THavsqwhqdfYCjtV53dxrlwAdVvgWTvFoKHEZJyrXb"
 
 # set up OAuth and integrate with API
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -111,4 +111,4 @@ def fetch_twetes(query=None):
     pass
 
 if __name__ == "__main__":
-    fetch_twetes("XLM")
+    fetch_twetes("crypto")
