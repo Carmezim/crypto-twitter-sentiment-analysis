@@ -1,4 +1,6 @@
 import numpy as np
+import argparse
+import os
 import sys
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout, Activation
@@ -10,30 +12,41 @@ from keras.preprocessing.sequence import pad_sequences
 
 # Performs classification using LSTM network.
 
-FREQ_DIST_FILE = './dataset/train-processed-freqdist.pkl'
-BI_FREQ_DIST_FILE = './dataset/train-processed-freqdist-bi.pkl'
-TRAIN_PROCESSED_FILE = './dataset/train-processed.csv'
-TEST_PROCESSED_FILE = './dataset/XLM-tweets-processed.csv'
-GLOVE_FILE = './dataset/numberbatch-en-17.06.txt'
-dim = 200
+parser = argparse.ArgumentParser(description='files')
+parser.add_argument('--train', required=False, help='training data')
+parser.add_argument('--test', required=False, help='test data')
+parser.add_argument('--freq', required=False, help='frequence distribution file')
+parser.add_argument('--bifreq', required=False, help='binomial frequency distribution')
+parser.add_argument('--model', required=False, help='model to be used for predictions')
+args = parser.parse_args()
+
+print(args.train)
+print(os.getcwd())
+print(os.path.join(os.getcwd(), args.train))
+FREQ_DIST_FILE = str(args.freq)
+BI_FREQ_DIST_FILE = str(args.bifreq)
+TRAIN_PROCESSED_FILE = str(args.train)
+TEST_PROCESSED_FILE = 'dataset/test-processed.csv'
+WORD_VECTORS = './dataset/numberbatch-en-17.06.txt'
+dim = 300
 
 
 def get_glove_vectors(vocab):
-    print('Looking for GLOVE vectors')
-    glove_vectors = {}
+    print('Looking for pre-trained vectors')
+    pretrained_vectors = {}
     found = 0
-    with open(GLOVE_FILE, 'r', encoding='utf-8') as glove_file:
+    with open(WORD_VECTORS, 'r', encoding='utf-8') as glove_file:
         for i, line in enumerate(glove_file):
             utils.write_status(i + 1, 0)
             tokens = line.split()
             word = tokens[0]
             if vocab.get(word):
                 vector = [float(e) for e in tokens[1:]]
-                glove_vectors[word] = np.array(vector)
+                pretrained_vectors[word] = np.array(vector)
                 found += 1
     print('\n')
-    print('Found %d words in GLOVE' % found)
-    return glove_vectors
+    print('Found %d words on pre-trained word vectors' % found)
+    return pretrained_vectors
 
 
 def get_feature_vector(tweet):
@@ -73,7 +86,7 @@ def process_tweets(csv_file, test_file=False):
 
 
 if __name__ == '__main__':
-    train = len(sys.argv) == 1
+    train = args.train is not None
     np.random.seed(2017)
     vocab_size = 80000
     batch_size = 128
@@ -106,27 +119,29 @@ if __name__ == '__main__':
         model.add(Activation('sigmoid'))
         model.compile(loss='binary_crossentropy', optimizer='adam',
                       metrics=['accuracy'])
-        filepath = "./models/lstm-{epoch:02d}-{loss:0.3f}-{acc:0.3f}-\
-            {val_loss:0.3f}-{val_acc:0.3f}.hdf5"
+        filepath = "./models/lstm-{epoch:02d}-{loss:0.3f}-{acc:0.3f}-{val_loss:0.3f}-{val_acc:0.3f}.hdf5"
         checkpoint = ModelCheckpoint(filepath, monitor="loss", verbose=1,
                                      save_best_only=True, mode='min')
-        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, verbose=1,
-                                      patience=3, min_lr=0.000001)
+        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.4, verbose=1,
+                                      patience=2, min_lr=0.000001)
         print(model.summary())
         model.fit(tweets, labels, batch_size=128, epochs=30,
                   validation_split=0.1, shuffle=True, callbacks=[checkpoint,
                                                                  reduce_lr])
     else:
-        model = load_model(sys.argv[1])
-        if len(sys.argv) == 3:
+        if args.model is not None:
+            model = load_model(args.model)
+        else:
+            print('model arg not defined on --model')
+        
+        if args.test is not None:
             # gets dataset file from command args to predict on
-            data_dir = sys.argv[2].split('/')
-            file_to_predict = data_dir[-1]
+            file_to_predict = args.train
         else:
             file_to_predict = TEST_PROCESSED_FILE
         print("Evaluating %s dataset" % file_to_predict)
         print(model.summary())
-        test_tweets, _ = process_tweets("/".join(data_dir), test_file=True)
+        test_tweets, _ = process_tweets(file_to_predict, test_file=True)
         test_tweets = pad_sequences(test_tweets, maxlen=max_length,
                                     padding='post')
         predictions = model.predict(test_tweets, batch_size=batch_size,
