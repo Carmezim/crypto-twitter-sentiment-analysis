@@ -1,5 +1,5 @@
 # Sentiment Analysis on Crypto Tweets
-Model and pre-processing code used were made by and adapted from https://github.com/abdulfatir/twitter-sentiment-analysis/.
+Model and pre-processing code used were adapted from https://github.com/abdulfatir/twitter-sentiment-analysis/.
 
 
 ## Requirements
@@ -29,9 +29,10 @@ training and test datasets.
 3. Create a `dataset` directory and run `split-data.py <dataset.csv>`. It'll
 split the data into a default split of 90% training and 10% test datasets. The split percentage can be defined as the third argument if desired e.g. `$python3 split-data.py dataset.csv 0.2`.
 4. Download GloVe pre-trained word vectors, unzip it and and rename
-`glove.twitter.27B.200d.txt` into `glove-seeds.txt` placing it inside `dataset`.
+`glove.twitter.27B.200d.txt` into `glove-seeds.txt` placing it inside `dataset`. 
 These pre-trained word vectors will be used when training our network:
-`wget http://nlp.stanford.edu/data/wordvecs/glove.twitter.27B.zip`
+`wget http://nlp.stanford.edu/data/wordvecs/glove.twitter.27B.zip` 
+(you could also use [ConceptNet embeddings](https://github.com/commonsense/conceptnet-numberbatch), if so make sure to change the dimension on `lstm.py` and files accordingly)
 5. Insert your Twitter API keys in `twitterAPI.py` 
 
 Make sure all data is properly modified according to the description provided,
